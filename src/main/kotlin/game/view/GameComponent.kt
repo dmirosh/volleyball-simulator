@@ -38,12 +38,13 @@ external interface GameState : RState {
     var draggingPlayer: PlayerSlot?
 }
 
-const val CANVAS_WIDTH = 800.0
-const val CANVAS_HEIGHT = 600.0
-
-const val SLOT_RADIUS = 20.0
 const val FIELD_WIDTH = 300.0
 const val FIELD_HEIGHT = 480.0
+
+const val CANVAS_WIDTH = FIELD_WIDTH * 2 + 100
+const val CANVAS_HEIGHT = FIELD_HEIGHT
+
+const val SLOT_RADIUS = 20.0
 
 data class Position(val x: Double, val y: Double)
 
@@ -125,7 +126,6 @@ class GameComponent : RComponent<GameProps, GameState>() {
             }
 
             val selectedBenchPlayer = it.benchPlayerWithPosition(clickedPosition)
-            println("selectedBenchPlayer = $selectedBenchPlayer")
             if (selectedBenchPlayer != null && (draggingPlayer == null || draggingPlayer.player == selectedBenchPlayer.player)) {
                 props.onPlayerMoveToField(selectedBenchPlayer.player!!)
             }
@@ -171,9 +171,6 @@ class GameComponent : RComponent<GameProps, GameState>() {
                     }
                     onMouseMoveFunction = {
                         onMouseMove(it.asDynamic().nativeEvent as MouseEvent)
-                    }
-                    onDragStartFunction = {
-                        println("on drag start  ${it::class.js.name}")
                     }
                 }
                 ref { state.canvas = findDOMNode(it) }

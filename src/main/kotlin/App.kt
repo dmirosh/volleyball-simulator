@@ -25,7 +25,7 @@ class App : RComponent<RProps, AppState>() {
     override fun AppState.init() {
         commandManager = CommandManager()
         game = Game()
-        notes = mutableListOf(Note("тестовая заметка"))
+        notes = mutableListOf()
     }
 
     override fun RBuilder.render() {

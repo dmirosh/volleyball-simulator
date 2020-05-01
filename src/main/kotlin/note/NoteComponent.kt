@@ -1,11 +1,13 @@
 package note
 
 import kotlinx.html.classes
+import kotlinx.html.js.onChangeFunction
 import kotlinx.html.js.onClickFunction
+import org.w3c.dom.HTMLTextAreaElement
+import org.w3c.dom.events.Event
 import react.*
-import react.dom.button
-import react.dom.div
-import react.dom.textArea
+import react.dom.*
+import styled.css
 
 fun RBuilder.notesList(handler: NotesProps.() -> Unit): ReactElement {
     return child(NotesComponent::class) {
@@ -27,27 +29,45 @@ external interface NotesState : RState {
 class NotesComponent : RComponent<NotesProps, NotesState>() {
 
     override fun NotesState.init() {
-        currentNote = "Новая заметка"
+        currentNote = ""
     }
 
     override fun RBuilder.render() {
         div {
-            attrs.classes = setOf("block")
+            attrs.classes = setOf("block", "notesWrapper")
             div { +"Заметки:" }
-            textArea {
+            div {
+                textArea(cols = "80", rows = "10") {
+                    attrs {
+                        value = state.currentNote
+                        onChangeFunction = {
+                            handleChange(it)
+                        }
+                    }
+                }
+            }
+            button {
+                attrs.onClickFunction = {
+                    val newNote = state.currentNote
+                    setState { currentNote = "" }
+                    if (newNote.trim().isNotEmpty()) {
+                        props.onAddNote(newNote)
+                    }
+                }
+                +"Новая заметка"
+            }
+            div {
+                for (note in props.notes) {
+                    div { +note.content }
+                }
             }
         }
-        button {
-            attrs.onClickFunction = {
-                val newNote = state.currentNote
-                props.onAddNote(newNote)
-            }
-            +"Новая заметка"
-        }
-        div {
-            for (note in props.notes) {
-                div { +note.content }
-            }
+    }
+
+    private fun handleChange(event: Event) {
+        val textArea = event.target as? HTMLTextAreaElement ?: return
+        setState {
+            currentNote = textArea.value
         }
     }
 }
