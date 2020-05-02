@@ -1,4 +1,4 @@
-package game
+package com.dmirosh.model
 
 import kotlinx.serialization.Serializable
 
@@ -19,35 +19,28 @@ fun TeamName.otherTeam(): TeamName = when (this) {
 
 @Serializable
 data class Player(
-    val name: String,
-    val teamName: TeamName,
+    var name: String,
+    var teamName: TeamName,
     var positionOnField: Int?,
     var libero: Boolean
 )
 
+fun defaultTeam(teamName: TeamName): MutableList<Player> {
+    return (0..11).map {
+        Player(
+            teamName = teamName,
+            name = "${it + 1}",
+            libero = false,
+            positionOnField = null
+        )
+    }.toMutableList()
+}
 
 @Serializable
-class Team(
+data class Team(
     val name: TeamName,
-    var players: List<Player> = listOf()
+    var players: MutableList<Player>
 ) {
-    init {
-        if (players.isEmpty()) {
-            players = defaultTeam(name)
-        }
-    }
-
-    private fun defaultTeam(teamName: TeamName): List<Player> {
-        return (0..11).map {
-            Player(
-                teamName = teamName,
-                name = "${it + 1}",
-                libero = false,
-                positionOnField = null
-            )
-        }
-    }
-
     fun removeLiberoFromField() {
         val libero = players.firstOrNull { it.libero }
         val playerOnLiberoPosition = players.firstOrNull { it.positionOnField == LIBERO_POSITION }
@@ -84,16 +77,19 @@ class Team(
         get() = players.filter { it.positionOnField != null && it.positionOnField != LIBERO_POSITION }
             .sortedBy { it.positionOnField }
 
-    fun moveLiberoToField(newLibero: Player?, unused: Player?) {
+    fun moveLiberoToField(newLiberoName: String?, unused: String?) {
         players.forEach { it.libero = false }
         players.filter { it.positionOnField == LIBERO_POSITION }.forEach { it.positionOnField = null }
-        if (newLibero != null) {
-            newLibero.libero = true
-            newLibero.positionOnField = LIBERO_POSITION
+        if (newLiberoName != null) {
+            players[newLiberoName].let {
+                it.libero = true
+                it.positionOnField = LIBERO_POSITION
+            }
         }
     }
 
-    fun moveToField(player: Player, position: Int) {
+    fun moveToField(playerName: String, position: Int) {
+        val player = players[playerName]
         if (player.positionOnField != null) {
             return
         }
@@ -105,7 +101,8 @@ class Team(
         }
     }
 
-    fun removeFromField(player: Player) {
+    fun removeFromField(playerName: String) {
+        val player = players[playerName]
         if (player.libero) {
             player.libero = false
             if (player.positionOnField != LIBERO_POSITION) {
@@ -132,4 +129,9 @@ class Team(
         }
         return pos
     }
+
+    private operator fun MutableList<Player>.get(name: String): Player {
+        return players.first { it.name == name }
+    }
 }
+

@@ -1,6 +1,7 @@
 package command
 
 import game.Game
+import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 import kotlin.math.max
 
@@ -51,5 +52,10 @@ data class CommandManager(
         }
         currentCommandIndex++
         commands[currentCommandIndex].execute(game)
+    }
+
+    fun change(commandManager: CommandManager) {
+        this.commands = commandManager.commands
+        this.currentCommandIndex = commandManager.currentCommandIndex
     }
 }

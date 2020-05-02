@@ -3,14 +3,17 @@ package command
 import game.Game
 import game.Player
 import game.TeamName
+import kotlinx.serialization.Polymorphic
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class Command {
+abstract sealed class Command {
     abstract fun execute(game: Game)
     abstract fun rollback(game: Game)
 
     @Serializable
+    @SerialName("SwitchTurn")
     object SwitchTurn : Command() {
         override fun execute(game: Game) {
             game.switchTurn()
@@ -22,60 +25,71 @@ sealed class Command {
     }
 
     @Serializable
-    data class ReturnToBench(val player: Player, val position: Int) : Command() {
+    @SerialName("ReturnToBench")
+    data class ReturnToBench(
+        val team: TeamName,
+        val player: String,
+        val position: Int) : Command() {
         override fun execute(game: Game) {
-            game.removeFromField(player)
+            game.removeFromField(team, player)
         }
 
         override fun rollback(game: Game) {
-            game.moveToField(player, position)
+            game.moveToField(team, player, position)
         }
     }
 
     @Serializable
+    @SerialName("MoveToField")
     data class MoveToField(
-        val player: Player,
+        val team: TeamName,
+        val player: String,
         val position: Int
     ) : Command() {
         override fun execute(game: Game) {
-            game.moveToField(player, position)
+            game.moveToField(team, player, position)
         }
 
         override fun rollback(game: Game) {
-            game.removeFromField(player)
+            game.removeFromField(team, player)
         }
     }
 
     @Serializable
+    @SerialName("ChangePlayers")
     data class ChangePlayers(
-        val newPlayer: Player,
+        val team: TeamName,
+        val newPlayer: String,
         val position: Int,
-        val oldPlayer: Player?
+        val oldPlayer: String?
     ) : Command() {
         override fun execute(game: Game) {
-            game.moveToField(newPlayer, position)
+            game.moveToField(team,newPlayer, position)
         }
 
         override fun rollback(game: Game) {
-            game.removeFromField(newPlayer)
+            game.removeFromField(team,newPlayer)
             if (oldPlayer != null) {
-                game.moveToField(oldPlayer, position)
+                game.moveToField(team, oldPlayer, position)
             }
         }
     }
 
     @Serializable
-    data class MoveLiberoToField(val newLibero: Player, val oldLibero: Player?) : Command() {
+    @SerialName("MoveLiberoToField")
+    data class MoveLiberoToField(val team: TeamName,
+                                 val newLibero: String, val oldLibero: String?) : Command() {
         override fun execute(game: Game) {
-            game.moveLiberoToField(newLibero.teamName, newLibero, oldLibero)
+            game.moveLiberoToField(team, newLibero, oldLibero)
         }
 
         override fun rollback(game: Game) {
-            game.moveLiberoToField(newLibero.teamName, oldLibero, newLibero)
+            game.moveLiberoToField(team, oldLibero, newLibero)
         }
     }
 
     @Serializable
+    @SerialName("SuccessfulTurn")
     data class SuccessfulTurn(val team: TeamName) : Command() {
         override fun execute(game: Game) {
             game.makeTurnSuccess()
@@ -87,6 +101,7 @@ sealed class Command {
     }
 
     @Serializable
+    @SerialName("FailedTurn")
     data class FailedTurn(val team: TeamName) : Command() {
         override fun execute(game: Game) {
             game.makeTurnFailure()

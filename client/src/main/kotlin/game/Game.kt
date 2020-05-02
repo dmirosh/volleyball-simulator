@@ -9,19 +9,16 @@ data class Score(
 )
 
 @Serializable
-class Game {
-    var score: Score = Score()
-    var currentTeam: TeamName = TeamName.TEAM_A
+data class Game(
+    var score: Score = Score(),
+    var currentTeam: TeamName = TeamName.TEAM_A,
     var teams: Map<TeamName, Team> = mapOf()
-
-    init {
-        reset()
-    }
+) {
 
     fun reset() {
         score = Score()
         currentTeam = TeamName.TEAM_A
-        teams = TeamName.values().associate { it to Team(it) }
+        teams = TeamName.values().associate { it to Team(it, defaultTeam(it)) }
     }
 
     fun switchTurn() {
@@ -47,16 +44,16 @@ class Game {
         }
     }
 
-    fun moveLiberoToField(team: TeamName, newLibero: Player?, oldLibero: Player?) {
+    fun moveLiberoToField(team: TeamName, newLibero: String?, oldLibero: String?) {
         teams[team]!!.moveLiberoToField(newLibero, oldLibero)
     }
 
-    fun moveToField(player: Player, position: Int) {
-        teams[player.teamName]!!.moveToField(player, position)
+    fun moveToField(team: TeamName, player: String, position: Int) {
+        teams[team]!!.moveToField(player, position)
     }
 
-    fun removeFromField(player: Player) {
-        teams[player.teamName]!!.removeFromField(player)
+    fun removeFromField(team: TeamName, player: String) {
+        teams[team]!!.removeFromField(player)
     }
 
     fun makeTurnSuccess() {

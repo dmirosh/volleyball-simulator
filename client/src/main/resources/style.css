@@ -1,0 +1,24 @@
+.block {
+  float:left;
+  margin-left:10;
+}
+.notesWrapper {
+  min-width: 1200px
+}
+.notesWrapper {
+  overflow: scroll;
+  max-width: 1200px
+}
+.goToCommandButton {
+  margin-left: 20px;
+}
+.commandWrapper {
+  margin-botton: 10px;
+}
+.scoreWrapper {
+  margin-top:200px;
+  margin-left: -250px
+}
+.clear {
+  clear:both
+}

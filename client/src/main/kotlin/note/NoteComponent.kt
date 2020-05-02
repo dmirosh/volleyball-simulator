@@ -7,7 +7,6 @@ import org.w3c.dom.HTMLTextAreaElement
 import org.w3c.dom.events.Event
 import react.*
 import react.dom.*
-import styled.css
 
 fun RBuilder.notesList(handler: NotesProps.() -> Unit): ReactElement {
     return child(NotesComponent::class) {
@@ -57,6 +56,7 @@ class NotesComponent : RComponent<NotesProps, NotesState>() {
                 +"Новая заметка"
             }
             div {
+                attrs.classes = setOf("notesList")
                 for (note in props.notes) {
                     div { +note.content }
                 }

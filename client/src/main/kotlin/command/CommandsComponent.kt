@@ -43,10 +43,12 @@ class CommandsComponent : RComponent<CommandsProps, RState>() {
             props.commands.forEachIndexed { index, command ->
                 val lastCommandMarker = if (props.currentCommandIndex == index) ">" else ""
                 div {
+                    attrs.classes = setOf("commandWrapper")
                     span {
                         +"$lastCommandMarker ${index + 1}: ${commandDescription(command)}"
                     }
                     button {
+                        attrs.classes = setOf("goToCommandButton")
                         attrs.onClickFunction = { props.onGoToCommand(index) }
                         +"Перейти на команду"
                     }
@@ -58,20 +60,20 @@ class CommandsComponent : RComponent<CommandsProps, RState>() {
 
     private fun commandDescription(command: Command): String = when (command) {
         Command.SwitchTurn -> "Смена стороны"
-        is Command.ReturnToBench -> "${command.player.teamName}: Игрок ${command.player.name} покинул позицию ${command.position}"
+        is Command.ReturnToBench -> "${command.team}: Игрок ${command.player} покинул позицию ${command.position}"
         is Command.MoveToField -> when (command.position) {
-            LIBERO_POSITION -> "${command.player.teamName}: Игрок ${command.player.name} стал либеро"
-            else -> "${command.player.teamName}: Игрок ${command.player.name} занял позицию ${command.position}"
+            LIBERO_POSITION -> "${command.team}: Игрок ${command.player} стал либеро"
+            else -> "${command.team}: Игрок ${command.player} занял позицию ${command.position}"
         }
         is Command.MoveLiberoToField -> when (command.oldLibero) {
-            null -> "${command.newLibero.teamName}: Игрок ${command.newLibero.name} стал либеро"
-            else -> "${command.newLibero.teamName}: Замена либеро с ${command.oldLibero.name} на ${command.newLibero.name}"
+            null -> "${command.team}: Игрок ${command.newLibero} стал либеро"
+            else -> "${command.team}: Замена либеро с ${command.oldLibero} на ${command.newLibero}"
         }
         is Command.SuccessfulTurn -> "${command.team}: Успешная подача"
         is Command.FailedTurn -> "${command.team}: Неуспешная подача"
         is Command.ChangePlayers -> when (command.oldPlayer) {
-            null -> "${command.newPlayer.teamName}: Игрок ${command.newPlayer.name} занял позицию ${command.position}"
-            else -> "${command.newPlayer.teamName}: Замена игрока с ${command.oldPlayer.name} на ${command.newPlayer.name}"
+            null -> "${command.team}: Игрок ${command.newPlayer} занял позицию ${command.position}"
+            else -> "${command.team}: Замена игрока с ${command.oldPlayer} на ${command.newPlayer}"
         }
     }
 }

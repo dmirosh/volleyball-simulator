@@ -21,7 +21,7 @@ fun RBuilder.game(handler: GameProps.() -> Unit): ReactElement {
 }
 
 external interface GameProps : RProps {
-    var game: Game
+    var game: MutableList<Game>
     var fieldImage: HTMLImageElement
     var onSuccessfulTurn: () -> Unit
     var onFailedTurn: () -> Unit
@@ -76,7 +76,7 @@ class GameComponent : RComponent<GameProps, GameState>() {
             FIELD_HEIGHT
         )
         ctx.fillStyle = "red"
-        if (props.game.currentTeam == TeamName.TEAM_A) {
+        if (props.game.first().currentTeam == TeamName.TEAM_A) {
             ctx.fillRect(0.0, 0.0, SLOT_RADIUS, SLOT_RADIUS)
         } else {
             ctx.fillRect(
@@ -198,7 +198,7 @@ class GameComponent : RComponent<GameProps, GameState>() {
 fun initFieldPlayers(team: TeamName, props: GameProps): List<PlayerSlot> {
     val commonPlayers = (0 until PLAYERS_ON_FIELD_COUNT).map {
         val position = CoordsManager.mapIndexToPositionOnField(team, it)
-        val player = props.game.playerOnPosition(team, position)
+        val player = props.game.first().playerOnPosition(team, position)
         PlayerSlot(
             position = position,
             coords = CoordsManager.getFieldPlayerCoords(team, it),
@@ -207,7 +207,7 @@ fun initFieldPlayers(team: TeamName, props: GameProps): List<PlayerSlot> {
         )
     }
 
-    val playerOnLiberoPosition = props.game.playerOnPosition(team, LIBERO_POSITION)
+    val playerOnLiberoPosition = props.game.first().playerOnPosition(team, LIBERO_POSITION)
     val libero = PlayerSlot(
         position = LIBERO_POSITION,
         coords = CoordsManager.getFieldPlayerCoords(team, LIBERO_POSITION),
@@ -219,7 +219,7 @@ fun initFieldPlayers(team: TeamName, props: GameProps): List<PlayerSlot> {
 
 
 private fun initBenchPlayers(team: TeamName, props: GameProps): List<PlayerSlot> {
-    return props.game.teamPlayers(team).mapIndexed { index, player ->
+    return props.game.first().teamPlayers(team).mapIndexed { index, player ->
         PlayerSlot(
             position = null,
             coords = CoordsManager.getBenchPlayerCoords(team, index),
