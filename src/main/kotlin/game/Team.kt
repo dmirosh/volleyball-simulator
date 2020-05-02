@@ -1,8 +1,11 @@
 package game
 
+import kotlinx.serialization.Serializable
+
 const val PLAYERS_ON_FIELD_COUNT = 6
 const val LIBERO_POSITION = -1
 
+@Serializable
 enum class TeamName {
     TEAM_A,
     TEAM_B
@@ -14,6 +17,7 @@ fun TeamName.otherTeam(): TeamName = when (this) {
 }
 
 
+@Serializable
 data class Player(
     val name: String,
     val teamName: TeamName,
@@ -22,10 +26,16 @@ data class Player(
 )
 
 
+@Serializable
 class Team(
-    name: TeamName
+    val name: TeamName,
+    var players: List<Player> = listOf()
 ) {
-    val players: List<Player> = defaultTeam(name)
+    init {
+        if (players.isEmpty()) {
+            players = defaultTeam(name)
+        }
+    }
 
     private fun defaultTeam(teamName: TeamName): List<Player> {
         return (0..11).map {

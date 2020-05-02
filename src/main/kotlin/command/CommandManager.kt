@@ -1,8 +1,10 @@
 package command
 
 import game.Game
+import kotlinx.serialization.Serializable
 import kotlin.math.max
 
+@Serializable
 data class CommandManager(
     var commands: MutableList<Command> = mutableListOf(),
     var currentCommandIndex: Int = -1

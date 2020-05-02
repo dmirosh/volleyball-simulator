@@ -5,6 +5,10 @@ import game.Game
 import game.Player
 import game.view.game
 import game.view.score
+import kotlinx.html.classes
+import kotlinx.html.js.onClickFunction
+import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.serialization.Serializable
 import note.Note
 import note.notesList
 import org.w3c.dom.HTMLImageElement
@@ -12,15 +16,19 @@ import react.RBuilder
 import react.RComponent
 import react.RProps
 import react.RState
+import react.dom.button
+import react.dom.div
 import kotlin.browser.document
 
 
+@Serializable
 data class AppState(
     var game: Game,
     var notes: MutableList<Note>,
     var commandManager: CommandManager
 ) : RState
 
+@ImplicitReflectionSerializer
 class App : RComponent<RProps, AppState>() {
     override fun AppState.init() {
         commandManager = CommandManager()
@@ -42,6 +50,9 @@ class App : RComponent<RProps, AppState>() {
             }
             onLiberoMoveToField = { newLibero, oldLibero -> liberoMoveToFieldHandler(newLibero, oldLibero) }
         }
+        score {
+            score = state.game.score
+        }
         commandsList {
             commands = state.commandManager.commands
             currentCommandIndex = state.commandManager.currentCommandIndex
@@ -58,14 +69,23 @@ class App : RComponent<RProps, AppState>() {
                 updateState()
             }
         }
-        score {
-            score = state.game.score
+        div {
+
         }
         notesList {
             notes = state.notes
             onAddNote = {
                 state.notes.add(Note(it))
                 updateState()
+            }
+        }
+        div {
+            attrs.classes = setOf("block")
+            button {
+                attrs.onClickFunction = {
+                    println(AppStateStorage.serialize(state))
+                }
+                +"Сохранить"
             }
         }
     }

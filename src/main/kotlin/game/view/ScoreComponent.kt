@@ -19,7 +19,7 @@ external interface ScoreProps : RProps {
 class ScoreComponent : RComponent<ScoreProps, RState>() {
     override fun RBuilder.render() {
         div {
-            attrs.classes = setOf("block")
+            attrs.classes = setOf("block", "scoreWrapper")
             h3 {
                 +"Счет: ${props.score.teamA} : ${props.score.teamB}"
             }

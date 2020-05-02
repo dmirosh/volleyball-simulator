@@ -1,10 +1,14 @@
 package game
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Score(
     var teamA: Int = 0,
     var teamB: Int = 0
 )
 
+@Serializable
 class Game {
     var score: Score = Score()
     var currentTeam: TeamName = TeamName.TEAM_A

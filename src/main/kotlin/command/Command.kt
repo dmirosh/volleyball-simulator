@@ -3,11 +3,14 @@ package command
 import game.Game
 import game.Player
 import game.TeamName
+import kotlinx.serialization.Serializable
 
+@Serializable
 sealed class Command {
     abstract fun execute(game: Game)
     abstract fun rollback(game: Game)
 
+    @Serializable
     object SwitchTurn : Command() {
         override fun execute(game: Game) {
             game.switchTurn()
@@ -18,6 +21,7 @@ sealed class Command {
         }
     }
 
+    @Serializable
     data class ReturnToBench(val player: Player, val position: Int) : Command() {
         override fun execute(game: Game) {
             game.removeFromField(player)
@@ -28,6 +32,7 @@ sealed class Command {
         }
     }
 
+    @Serializable
     data class MoveToField(
         val player: Player,
         val position: Int
@@ -41,6 +46,7 @@ sealed class Command {
         }
     }
 
+    @Serializable
     data class ChangePlayers(
         val newPlayer: Player,
         val position: Int,
@@ -58,6 +64,7 @@ sealed class Command {
         }
     }
 
+    @Serializable
     data class MoveLiberoToField(val newLibero: Player, val oldLibero: Player?) : Command() {
         override fun execute(game: Game) {
             game.moveLiberoToField(newLibero.teamName, newLibero, oldLibero)
@@ -68,6 +75,7 @@ sealed class Command {
         }
     }
 
+    @Serializable
     data class SuccessfulTurn(val team: TeamName) : Command() {
         override fun execute(game: Game) {
             game.makeTurnSuccess()
@@ -78,6 +86,7 @@ sealed class Command {
         }
     }
 
+    @Serializable
     data class FailedTurn(val team: TeamName) : Command() {
         override fun execute(game: Game) {
             game.makeTurnFailure()
